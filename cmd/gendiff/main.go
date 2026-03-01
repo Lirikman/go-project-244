@@ -1,6 +1,7 @@
 package main
 
 import (
+	"code"
 	"context"
 	"fmt"
 	"log"
@@ -34,12 +35,11 @@ func main() {
 			},
 		},
 		Action: func(context.Context, *cli.Command) error {
-			if path1 == "" {
-				return fmt.Errorf("Invalid file path 1")
-			} else if path2 == "" {
-				return fmt.Errorf("Invalid file path 2")
+			if path1 == "" || path2 == "" {
+				return fmt.Errorf("Invalid files path")
 			}
-			fmt.Printf("Path1: %s\nPath2: %s\n", path1, path2)
+			code.ReadData(path1)
+			code.ReadData(path2)
 			return nil
 		},
 	}
