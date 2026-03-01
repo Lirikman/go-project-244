@@ -1,7 +1,7 @@
 package main
 
 import (
-	"code"
+	parser "code/internal/parsers"
 	"context"
 	"fmt"
 	"log"
@@ -38,8 +38,8 @@ func main() {
 			if path1 == "" || path2 == "" {
 				return fmt.Errorf("Invalid files path")
 			}
-			code.ReadData(path1)
-			code.ReadData(path2)
+			parser.ReadData(path1)
+			parser.ReadData(path2)
 			return nil
 		},
 	}
