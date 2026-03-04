@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -18,42 +19,51 @@ func ReadFiles(path string) ([]byte, error) {
 	return data, nil
 }
 
-// определяем карту для хранения данных
-var parsData map[string]any
-
-// функция для очистки карты
-func clearMap(m map[string]any) {
-	for k := range m {
-		delete(m, k)
-	}
-}
+// определяем вложенную карту для хранения данных
+var parsData map[string]map[string]any
 
 // функция парсинга файлов .json в переменную parsData
 func ReadJson(path string, jsonByte []byte) error {
-	// очищаем карту перед десериализацией json
-	clearMap(parsData)
+	// создаём временную карту для десериализации json
+	var tempMap map[string]any
 	//  десериализуем json файл в карту
-	err := json.Unmarshal(jsonByte, &parsData)
+	err := json.Unmarshal(jsonByte, &tempMap)
 	if err != nil {
 		return fmt.Errorf("error: %w", err)
 	}
+	// получаем имя файла
+	fileName := filepath.Base(path)
+	// если карта пустая, то инициализируем её
+	if parsData == nil {
+		parsData = make(map[string]map[string]any)
+	}
+	//добавляем данные в основную карту
+	parsData[fileName] = tempMap
 	return nil
 }
 
 // функция парсинга файлов .yml в переменную parsData
 func ReadYaml(path string, yamlByte []byte) error {
-	// очищаем карту перед десериализацией нфьд
-	clearMap(parsData)
-	//  десериализуем yaml файл в карту
-	err := yaml.Unmarshal(yamlByte, &parsData)
+	// создаём временную карту для десериализации yaml
+	var tempMap map[string]any
+	//  десериализуем json файл в карту
+	err := yaml.Unmarshal(yamlByte, &tempMap)
 	if err != nil {
 		return fmt.Errorf("error: %w", err)
 	}
+	// получаем имя файла
+	fileName := filepath.Base(path)
+	// если карта пустая, то инициализируем её
+	if parsData == nil {
+		parsData = make(map[string]map[string]any)
+	}
+	//добавляем данные в основную карту
+	parsData[fileName] = tempMap
 	return nil
 }
 
 // функция чтения и парсинга файлов .json и .yaml
-func ReadData(path string) (map[string]any, error) {
+func ReadData(path string) (map[string]map[string]any, error) {
 	var res error
 	data, _ := ReadFiles(path)
 	// проверяем что расширение файла json

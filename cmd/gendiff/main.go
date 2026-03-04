@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path/filepath"
 	"slices"
 
 	"github.com/urfave/cli/v3"
@@ -48,22 +47,16 @@ func main() {
 				return fmt.Errorf("Invalid files path")
 			}
 
-			// парсинг данных мз файлов
-			data1, _ := parser.ReadData(path1)
-			fileName1 := filepath.Base(path1)
-			fmt.Printf("Файл: %s\n", fileName1)
-			for k, v := range data1 {
-				fmt.Printf("key:%v\tvalue:%v\n", k, v)
-			}
-
-			data2, _ := parser.ReadData(path2)
-			fileName2 := filepath.Base(path2)
-			fmt.Printf("Файл: %s\n", fileName2)
-			for k, v := range data2 {
-				fmt.Printf("key:%v\tvalue:%v\n", k, v)
-			}
-
-			fmt.Println(genDiff(data1, data2))
+			// парсинг данных из файлов
+			data, _ := parser.ReadData(path1)
+			data, _ = parser.ReadData(path2)
+			//for name, allData := range data {
+			//	fmt.Printf("Файл: %s\n", name)
+			//	for k, v := range allData {
+			//		fmt.Printf("key:%v\tvalue:%v\n", k, v)
+			//	}
+			//}
+			fmt.Println(genDiff(data))
 			return nil
 		},
 	}
@@ -73,44 +66,47 @@ func main() {
 	}
 }
 
-func genDiff(dataFile1, dataFile2 map[string]any) string {
+// функция сравнения json файлов
+func genDiff(dataFile map[string]map[string]any) string {
 	// переменная для сообщения
 	var res string
 	// переменная для хранения всех уникальных ключей
 	var allUniqueKeys []string
-	// получаем все уникальные ключи из обоих файлов
-	for k := range dataFile1 {
-		allUniqueKeys = append(allUniqueKeys, k)
-	}
-	for k := range dataFile2 {
-		if !slices.Contains(allUniqueKeys, k) {
-			allUniqueKeys = append(allUniqueKeys, k)
+	// переменная для хранения имён файлов
+	var allNames []string
+	// получаем все уникальные ключи из вложенной карты
+	for name, dataMap := range dataFile {
+		allNames = append(allNames, name)
+		for key := range dataMap {
+			if !slices.Contains(allUniqueKeys, key) {
+				allUniqueKeys = append(allUniqueKeys, key)
+			}
 		}
 	}
 	// сортируем ключи по возрастанию
 	slices.Sort(allUniqueKeys)
-	fmt.Println(allUniqueKeys)
+	// fmt.Println(allUniqueKeys)
 	// проходим по всем ключам и сравниваем
 	// формируем сообщение
 	res += "{\n"
 	for _, keyName := range allUniqueKeys {
 		// получаем ключи и наличие в карте
-		val1, ok1 := dataFile1[keyName]
-		val2, ok2 := dataFile2[keyName]
+		val1, ok1 := dataFile[allNames[0]][keyName]
+		val2, ok2 := dataFile[allNames[1]][keyName]
 		// проверяем условия и фомируем сообщение
 		// наличие в обеих картах и значения совпадают
 		if ok1 && ok2 && val1 == val2 {
-			res += fmt.Sprintf(" %s: %v\n", keyName, val1)
+			res += fmt.Sprintf("    %s: %v\n", keyName, val1)
 			// наличие в обеих картах и значения не совпадают
 		} else if ok1 && ok2 && val1 != val2 {
-			res += fmt.Sprintf(" - %s: %v\n", keyName, val1)
-			res += fmt.Sprintf(" + %s: %v\n", keyName, val2)
+			res += fmt.Sprintf("  - %s: %v\n", keyName, val1)
+			res += fmt.Sprintf("  + %s: %v\n", keyName, val2)
 			// наличие ключа только в первой карте
 		} else if ok1 && !ok2 {
-			res += fmt.Sprintf(" - %s: %v\n", keyName, val1)
+			res += fmt.Sprintf("  - %s: %v\n", keyName, val1)
 			// наличие ключа только во второй карте
 		} else if !ok1 && ok2 {
-			res += fmt.Sprintf(" + %s: %v\n", keyName, val2)
+			res += fmt.Sprintf("  + %s: %v\n", keyName, val2)
 		}
 	}
 	res += ("}\n")
