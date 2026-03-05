@@ -44,12 +44,12 @@ func main() {
 				return fmt.Errorf("files at the entered path were not found")
 			}
 			if path1 == "" || path2 == "" {
-				return fmt.Errorf("Invalid files path")
+				return fmt.Errorf("invalid files path")
 			}
 
 			// парсинг данных из файлов
-			data, _ := parser.ReadData(path1)
-			data, _ = parser.ReadData(path2)
+			_, _ = parser.ReadData(path1)
+			data, _ := parser.ReadData(path2)
 			//for name, allData := range data {
 			//	fmt.Printf("Файл: %s\n", name)
 			//	for k, v := range allData {
