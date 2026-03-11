@@ -2,6 +2,7 @@ package parsers
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -29,7 +30,7 @@ func ReadJson(path string, jsonByte []byte) error {
 	//  десериализуем json файл в карту
 	err := json.Unmarshal(jsonByte, &tempMap)
 	if err != nil {
-		return fmt.Errorf("error: %w", err)
+		return errors.New("unable to deserialize JSON file")
 	}
 	// получаем имя файла
 	fileName := filepath.Base(path)
@@ -49,7 +50,7 @@ func ReadYaml(path string, yamlByte []byte) error {
 	//  десериализуем json файл в карту
 	err := yaml.Unmarshal(yamlByte, &tempMap)
 	if err != nil {
-		return fmt.Errorf("error: %w", err)
+		return errors.New("unable to deserialize YAML file")
 	}
 	// получаем имя файла
 	fileName := filepath.Base(path)
@@ -65,19 +66,22 @@ func ReadYaml(path string, yamlByte []byte) error {
 // функция чтения и парсинга файлов .json и .yaml
 func ReadData(path string) (map[string]map[string]any, error) {
 	var res error
-	data, _ := ReadFiles(path)
+	data, err := ReadFiles(path)
+	if err != nil {
+		return nil, fmt.Errorf("%w", err)
+	}
 	// проверяем что расширение файла json
 	if strings.HasSuffix(path, ".json") {
 		res = ReadJson(path, data)
 		if res != nil {
-			return nil, fmt.Errorf("error: %w", res)
+			return nil, fmt.Errorf("%w", res)
 		}
 	}
 	// проверяем что расширение файла yml
 	if strings.HasSuffix(path, ".yml") || strings.HasSuffix(path, ".yaml") {
 		res = ReadYaml(path, data)
 		if res != nil {
-			return nil, fmt.Errorf("error: %w", res)
+			return nil, fmt.Errorf("%w", res)
 		}
 	}
 	return parsData, nil

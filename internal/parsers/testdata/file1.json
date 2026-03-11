@@ -1,7 +1,5 @@
 {
   "user_id": "100", 
-  "username": "ivan_hacker", 
-  "email": "iv_hacker80@example.com", 
-  "login_count": 15, 
+  "username": "ivan", 
   "is_admin": false
 }
