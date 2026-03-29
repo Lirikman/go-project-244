@@ -56,6 +56,7 @@ func main() {
 			//		fmt.Printf("key:%v\tvalue:%v\n", k, v)
 			//	}
 			//}
+			//fmt.Println(data)
 			fmt.Println(code.GenDiff(data))
 			return nil
 		},
