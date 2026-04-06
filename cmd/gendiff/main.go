@@ -57,7 +57,8 @@ func main() {
 			//	}
 			//}
 			//fmt.Println(data)
-			fmt.Println(code.GenDiff(data))
+			data1, data2 := code.SplitNestedMap(data)
+			fmt.Println(code.GenDiff(data1, data2))
 			return nil
 		},
 	}

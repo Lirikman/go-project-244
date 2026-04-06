@@ -1,39 +1,44 @@
 package code
 
 import (
-	"fmt"
+	"reflect"
 	"slices"
 )
 
-// функция рекурсивного обхода карт
-func walkMap(m map[string]any, depth int) {
-	for k, v := range m {
-		switch value := v.(type) {
-		case map[string]any:
-			fmt.Printf("%d. %s\n", depth, k)
-			walkMap(value, depth+1)
-		default:
-			fmt.Printf("%d. %s: %v\n", depth, k, v)
-		}
+// функция разделения вложенной карты на две отдельные карты
+func SplitNestedMap(dataMap map[string]map[string]any) (map[string]any, map[string]any) {
+	// переменная для хранения имён файлов
+	var allNames []string
+	// создаём и инициализируем карту для данных первого файла
+	data1 := make(map[string]any)
+	// создаём и инициализируем карту для данных второго файла
+	data2 := make(map[string]any)
+	// получаем имена файлов
+	for filename := range dataMap {
+		allNames = append(allNames, filename)
 	}
+	// заполняем карты
+	data1 = dataMap[allNames[0]]
+	data2 = dataMap[allNames[1]]
+	return data1, data2
 }
 
 // функция сравнения файлов
-func GenDiff(dataMap map[string]map[string]any) error {
-	// переменная для хранения имён файлов
-	var allNames []string
+func GenDiff(data1 map[string]any, data2 map[string]any) map[string]map[string]any {
 	// переменная для хранения уникальных ключей текущего уровня
 	var allUniqueKeys []string
-	// получаем имена файлов и уникальные ключи текущего уровня вложенности
-	for filename, data := range dataMap {
-		allNames = append(allNames, filename)
-		for key := range data {
-			if !slices.Contains(allUniqueKeys, key) {
-				allUniqueKeys = append(allUniqueKeys, key)
-			}
+	// получаем ключи с первой карты
+	for key := range data1 {
+		if !slices.Contains(allUniqueKeys, key) {
+			allUniqueKeys = append(allUniqueKeys, key)
 		}
 	}
-
+	// получаем ключи со второй карты
+	for key := range data2 {
+		if !slices.Contains(allUniqueKeys, key) {
+			allUniqueKeys = append(allUniqueKeys, key)
+		}
+	}
 	// сортируем ключи по возрастанию
 	slices.Sort(allUniqueKeys)
 	// переменная для хранения дерева различий
@@ -41,8 +46,8 @@ func GenDiff(dataMap map[string]map[string]any) error {
 	// проходим в цикле по обеим картам
 	for _, nameKey := range allUniqueKeys {
 		// получаем значения ключей и их наличие
-		val1, ok1 := dataMap[allNames[0]][nameKey]
-		val2, ok2 := dataMap[allNames[1]][nameKey]
+		val1, ok1 := data1[nameKey]
+		val2, ok2 := data2[nameKey]
 		// значение отсутствует в первой карте
 		if !ok1 {
 			if diff == nil {
@@ -50,7 +55,7 @@ func GenDiff(dataMap map[string]map[string]any) error {
 				diff = make(map[string]map[string]any)
 			}
 			diff[nameKey]["type"] = "added"
-			diff[nameKey]["value"] = val2
+			diff[nameKey]["value2"] = val2
 		}
 		// 	значение отсутствует во второй карте
 		if !ok2 {
@@ -59,17 +64,31 @@ func GenDiff(dataMap map[string]map[string]any) error {
 				diff = make(map[string]map[string]any)
 			}
 			diff[nameKey]["type"] = "deleted"
-			diff[nameKey]["value"] = val1
+			diff[nameKey]["value1"] = val1
 		}
 		// значения присутствуют в обеих картах
 		if ok1 && ok2 {
 			// проверяем тип обеих значений
-			type1 := fmt.Sprintf("%T", val1)
-			type2 := fmt.Sprintf("%T", val2)
-			fmt.Println(type1)
-			fmt.Println(type2)
+			m1, typeOk1 := val1.(map[string]any)
+			m2, typeOk2 := val2.(map[string]any)
+			// оба значения являются картами
+			if typeOk1 && typeOk2 {
+				diff[nameKey]["type"] = "nested"
+				diff[nameKey]["children"] = GenDiff(m1, m2)
+				// одно или оба значения не являются картами
+				// сравниваем с помощью рефлексии
+			} else {
+				if reflect.DeepEqual(m1, m2) {
+					diff[nameKey]["type"] = "unchanged"
+					diff[nameKey]["value1"] = m1
+				} else {
+					diff[nameKey]["type"] = "changed"
+					diff[nameKey]["value1"] = m1
+					diff[nameKey]["value2"] = m2
+				}
+			}
 		}
 	}
 
-	return nil
+	return diff
 }
