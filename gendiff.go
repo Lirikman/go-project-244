@@ -23,7 +23,7 @@ func SplitNestedMap(dataMap map[string]map[string]any) (map[string]any, map[stri
 	return data1, data2
 }
 
-// функция сравнения файлов
+// функция построения дерева различий
 func GenDiff(data1 map[string]any, data2 map[string]any) map[string]map[string]any {
 	// переменная для хранения уникальных ключей текущего уровня
 	var allUniqueKeys []string
@@ -43,6 +43,8 @@ func GenDiff(data1 map[string]any, data2 map[string]any) map[string]map[string]a
 	slices.Sort(allUniqueKeys)
 	// переменная для хранения дерева различий
 	var diff map[string]map[string]any
+	// инициализируем карту
+	diff = make(map[string]map[string]any)
 	// проходим в цикле по обеим картам
 	for _, nameKey := range allUniqueKeys {
 		// получаем значения ключей и их наличие
@@ -50,18 +52,18 @@ func GenDiff(data1 map[string]any, data2 map[string]any) map[string]map[string]a
 		val2, ok2 := data2[nameKey]
 		// значение отсутствует в первой карте
 		if !ok1 {
-			if diff == nil {
-				// если карта пустая, то инициализируем её
-				diff = make(map[string]map[string]any)
+			// если карта пустая, то инициализируем её
+			if diff[nameKey] == nil {
+				diff[nameKey] = make(map[string]any)
 			}
 			diff[nameKey]["type"] = "added"
 			diff[nameKey]["value2"] = val2
 		}
 		// 	значение отсутствует во второй карте
 		if !ok2 {
-			if diff == nil {
-				// если карта пустая, то инициализируем её
-				diff = make(map[string]map[string]any)
+			// если карта пустая, то инициализируем её
+			if diff[nameKey] == nil {
+				diff[nameKey] = make(map[string]any)
 			}
 			diff[nameKey]["type"] = "deleted"
 			diff[nameKey]["value1"] = val1
@@ -73,18 +75,26 @@ func GenDiff(data1 map[string]any, data2 map[string]any) map[string]map[string]a
 			m2, typeOk2 := val2.(map[string]any)
 			// оба значения являются картами
 			if typeOk1 && typeOk2 {
+				// если карта пустая, то инициализируем её
+				if diff[nameKey] == nil {
+					diff[nameKey] = make(map[string]any)
+				}
 				diff[nameKey]["type"] = "nested"
 				diff[nameKey]["children"] = GenDiff(m1, m2)
 				// одно или оба значения не являются картами
-				// сравниваем с помощью рефлексии
 			} else {
-				if reflect.DeepEqual(m1, m2) {
+				// если карта пустая, то инициализируем её
+				if diff[nameKey] == nil {
+					diff[nameKey] = make(map[string]any)
+				}
+				// сравниваем с помощью рефлексии
+				if reflect.DeepEqual(val1, val2) {
 					diff[nameKey]["type"] = "unchanged"
-					diff[nameKey]["value1"] = m1
+					diff[nameKey]["value1"] = val1
 				} else {
 					diff[nameKey]["type"] = "changed"
-					diff[nameKey]["value1"] = m1
-					diff[nameKey]["value2"] = m2
+					diff[nameKey]["value1"] = val1
+					diff[nameKey]["value2"] = val2
 				}
 			}
 		}
