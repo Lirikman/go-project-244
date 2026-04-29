@@ -50,15 +50,11 @@ func main() {
 			// парсинг данных из файлов
 			_, _ = parser.ReadData(path1)
 			data, _ := parser.ReadData(path2)
-			//for name, allData := range data {
-			//	fmt.Printf("Файл: %s\n", name)
-			//	for k, v := range allData {
-			//		fmt.Printf("key:%v\tvalue:%v\n", k, v)
-			//	}
-			//}
-			//fmt.Println(data)
+			// разделение на две карты
 			data1, data2 := code.SplitNestedMap(data)
-			fmt.Println(code.GenDiff(data1, data2))
+			// построение дерева отличий
+			deffTree := code.GenDiff(data1, data2)
+			fmt.Println(code.FormatterStylish(deffTree))
 			return nil
 		},
 	}
