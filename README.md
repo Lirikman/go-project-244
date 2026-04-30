@@ -11,3 +11,7 @@ https://asciinema.org/a/8FBjj6DRgtVRE5W2
 ### Asciinema сomparison of flat YAML files
 
 https://asciinema.org/a/GthGBNFWEzH3mCsZ
+
+### Asciinema comparison nested JSON, YAML files
+
+https://asciinema.org/a/Vw5hQ4WYXjtX6bhP

@@ -119,10 +119,10 @@ func FormatterStylish(tree map[string]map[string]any) string {
 			} else {
 				builder.WriteString(strings.Repeat(".", indent))
 				fmt.Fprintf(&builder, "%v: %v\n", key, val)
-				builder.WriteString(strings.Repeat(".", indent-4))
-				builder.WriteString("}\n")
 			}
 		}
+		builder.WriteString(strings.Repeat(".", indent-4))
+		builder.WriteString("}\n")
 	}
 
 	// анонимная функция для рекурсивного обхода дерева различий
