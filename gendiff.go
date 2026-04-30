@@ -99,7 +99,6 @@ func GenDiff(data1 map[string]any, data2 map[string]any) map[string]map[string]a
 			}
 		}
 	}
-
 	return diff
 }
 
@@ -120,10 +119,10 @@ func FormatterStylish(tree map[string]map[string]any) string {
 			} else {
 				builder.WriteString(strings.Repeat(".", indent))
 				fmt.Fprintf(&builder, "%v: %v\n", key, val)
+				builder.WriteString(strings.Repeat(".", indent-4))
+				builder.WriteString("}\n")
 			}
 		}
-		builder.WriteString(strings.Repeat(".", indent-4))
-		builder.WriteString("}\n")
 	}
 
 	// анонимная функция для рекурсивного обхода дерева различий
@@ -201,7 +200,9 @@ func FormatterStylish(tree map[string]map[string]any) string {
 					builder.WriteString("  }")
 				}
 			}
-			builder.WriteString("\n")
+			if !strings.HasSuffix(builder.String(), "\n") {
+				builder.WriteString("\n")
+			}
 		}
 	}
 	// запускаем рекурсивный обход дерева

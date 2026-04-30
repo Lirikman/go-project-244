@@ -35,7 +35,7 @@ func main() {
 				Usage:   "output format",
 			},
 		},
-		Action: func(context.Context, *cli.Command) error {
+		Action: func(ctx context.Context, cmd *cli.Command) error {
 			// проверка корректности путей к файлам
 			_, errPath1 := os.Stat(path1)
 			_, errPath2 := os.Stat(path2)
@@ -54,7 +54,10 @@ func main() {
 			data1, data2 := code.SplitNestedMap(data)
 			// построение дерева отличий
 			deffTree := code.GenDiff(data1, data2)
-			fmt.Println(code.FormatterStylish(deffTree))
+			// построение ответа в формате "stylish"
+			if cmd.String("format string") == "" {
+				fmt.Println(code.FormatterStylish(deffTree))
+			}
 			return nil
 		},
 	}
