@@ -77,7 +77,7 @@ func ReadData(path string) (map[string]map[string]any, error) {
 			return nil, fmt.Errorf("%w", res)
 		}
 	}
-	// проверяем что расширение файла yml
+	// проверяем что расширение файла yml или yaml
 	if strings.HasSuffix(path, ".yml") || strings.HasSuffix(path, ".yaml") {
 		res = ReadYaml(path, data)
 		if res != nil {

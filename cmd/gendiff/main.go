@@ -2,6 +2,7 @@ package main
 
 import (
 	"code"
+	formatters "code/internal/formatters"
 	parser "code/internal/parsers"
 	"context"
 	"fmt"
@@ -29,10 +30,10 @@ func main() {
 		},
 		Flags: []cli.Flag{
 			&cli.StringFlag{
-				Name:    "format string",
+				Name:    "format",
 				Aliases: []string{"f"},
 				Value:   "stylish",
-				Usage:   "output format",
+				Usage:   "supported formats: stylish, plain",
 			},
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
@@ -48,16 +49,22 @@ func main() {
 			}
 
 			// парсинг данных из файлов
-			_, _ = parser.ReadData(path1)
-			data, _ := parser.ReadData(path2)
+			data, err := parser.ReadData(path1)
+			if err != nil {
+				return err
+			}
+			data, err = parser.ReadData(path2)
+			if err != nil {
+				return err
+			}
 			// разделение на две карты
 			data1, data2 := code.SplitNestedMap(data)
+			// очистка данных парсинга
+			clear(data)
 			// построение дерева отличий
 			deffTree := code.GenDiff(data1, data2)
-			// построение ответа в формате "stylish"
-			if cmd.String("format string") == "" {
-				fmt.Println(code.FormatterStylish(deffTree))
-			}
+			// построение ответа в выбранном формате (по умолчанию - "stylish")
+			fmt.Println(formatters.FormatMessage(deffTree, cmd.String("format")))
 			return nil
 		},
 	}
