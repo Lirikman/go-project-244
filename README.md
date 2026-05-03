@@ -12,6 +12,9 @@ https://asciinema.org/a/8FBjj6DRgtVRE5W2
 
 https://asciinema.org/a/GthGBNFWEzH3mCsZ
 
-### Asciinema comparison nested JSON, YAML files
+### Asciinema comparison nested JSON, YAML files format 'stylish'
 
 https://asciinema.org/a/Vw5hQ4WYXjtX6bhP
+
+### Asciinema comparison nested JSON, YAML files format 'plain'
+https://asciinema.org/a/MzGoPOq17EdcJBSb
