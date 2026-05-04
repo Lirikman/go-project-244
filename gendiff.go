@@ -9,17 +9,14 @@ import (
 func SplitNestedMap(dataMap map[string]map[string]any) (map[string]any, map[string]any) {
 	// переменная для хранения имён файлов
 	var allNames []string
-	// создаём и инициализируем карту для данных первого файла
-	data1 := make(map[string]any)
-	// создаём и инициализируем карту для данных второго файла
-	data2 := make(map[string]any)
+
 	// получаем имена файлов
 	for filename := range dataMap {
 		allNames = append(allNames, filename)
 	}
-	// заполняем карты
-	data1 = dataMap[allNames[0]]
-	data2 = dataMap[allNames[1]]
+	//  создаём и заполняем карты
+	data1 := dataMap[allNames[0]]
+	data2 := dataMap[allNames[1]]
 	return data1, data2
 }
 
@@ -39,10 +36,8 @@ func GenDiff(data1 map[string]any, data2 map[string]any) map[string]map[string]a
 			allUniqueKeys = append(allUniqueKeys, key)
 		}
 	}
-	// переменная для хранения дерева различий
-	var diff map[string]map[string]any
-	// инициализируем карту
-	diff = make(map[string]map[string]any)
+	// создаём и инициализируем карту для хранения дерева различий
+	diff := make(map[string]map[string]any)
 	// проходим в цикле по обеим картам
 	for _, nameKey := range allUniqueKeys {
 		// получаем значения ключей и их наличие

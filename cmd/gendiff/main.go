@@ -33,7 +33,7 @@ func main() {
 				Name:    "format",
 				Aliases: []string{"f"},
 				Value:   "stylish",
-				Usage:   "supported formats: stylish, plain",
+				Usage:   "supported formats: stylish, plain, json",
 			},
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
@@ -49,11 +49,11 @@ func main() {
 			}
 
 			// парсинг данных из файлов
-			data, err := parser.ReadData(path1)
+			_, err := parser.ReadData(path1)
 			if err != nil {
 				return err
 			}
-			data, err = parser.ReadData(path2)
+			data, err := parser.ReadData(path2)
 			if err != nil {
 				return err
 			}

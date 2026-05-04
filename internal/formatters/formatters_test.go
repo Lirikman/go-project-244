@@ -99,3 +99,31 @@ func TestFormatterPlainComplexValue(t *testing.T) {
 		t.Errorf("want: %s, got: %s", want, got)
 	}
 }
+
+func TestFormattersJsonFlatFiles(t *testing.T) {
+	diffTreeTest := map[string]map[string]any{"follow": {"type": "deleted", "value1": "false"}, "host": {"type": "unchanged", "value1": "hexlet.io"}, "proxy": {"type": "added", "value2": "123.234.53.22"}, "timeout": {"type": "changed", "value1": 50, "value2": 23}}
+
+	got := FormmaterJson(diffTreeTest)
+
+	want := "{\n  \"follow\": {\n    \"type\": \"deleted\",\n    \"value1\": \"false\"\n  },\n  \"host\": {\n    \"type\": \"unchanged\",\n    \"value1\": \"hexlet.io\"\n  },\n  \"proxy\": {\n    \"type\": \"added\",\n    \"value2\": \"123.234.53.22\"\n  },\n  \"timeout\": {\n    \"type\": \"changed\",\n    \"value1\": 50,\n    \"value2\": 23\n  }\n}"
+
+	if got != want {
+		t.Errorf("want: %s, got: %s", want, got)
+	}
+}
+
+func TestFormattersJsonNestedFiles(t *testing.T) {
+	diffTreeTest := map[string]map[string]any{
+		"user": {"type": "nested", "children": map[string]map[string]any{"first_name": {"type": "unchanged", "value1": "Maksim"},
+			"last_name": {"type": "changed", "value1": "Ivanov", "value2": "Petrov"}, "age": {"type": "added", "value2": 30},
+			"job": {"type": "deleted", "value1": "designer"}}},
+		"games": {"type": "added", "value2": "the wither 3 wild hunt"},
+	}
+
+	got := FormmaterJson(diffTreeTest)
+	want := "{\n  \"games\": {\n    \"type\": \"added\",\n    \"value2\": \"the wither 3 wild hunt\"\n  },\n  \"user\": {\n    \"children\": {\n      \"age\": {\n        \"type\": \"added\",\n        \"value2\": 30\n      },\n      \"first_name\": {\n        \"type\": \"unchanged\",\n        \"value1\": \"Maksim\"\n      },\n      \"job\": {\n        \"type\": \"deleted\",\n        \"value1\": \"designer\"\n      },\n      \"last_name\": {\n        \"type\": \"changed\",\n        \"value1\": \"Ivanov\",\n        \"value2\": \"Petrov\"\n      }\n    },\n    \"type\": \"nested\"\n  }\n}"
+
+	if got != want {
+		t.Errorf("want: %s, got: %s", want, got)
+	}
+}

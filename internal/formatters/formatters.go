@@ -8,5 +8,8 @@ func FormatMessage(tree map[string]map[string]any, format string) string {
 	if format == "plain" {
 		message = FormmaterPlain(tree)
 	}
+	if format == "json" {
+		message = FormmaterJson(tree)
+	}
 	return message
 }
