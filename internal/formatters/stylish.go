@@ -6,6 +6,15 @@ import (
 	"strings"
 )
 
+func stringifyNil(value any) string {
+	switch v := value.(type) {
+	case nil:
+		return "null"
+	default:
+		return fmt.Sprintf("%v", v)
+	}
+}
+
 // функция форматирования ответа в stylish
 func FormatterStylish(tree map[string]map[string]any) string {
 	var builder strings.Builder
@@ -22,7 +31,7 @@ func FormatterStylish(tree map[string]map[string]any) string {
 				walkMap(nestedMap, d+1)
 			} else {
 				builder.WriteString(strings.Repeat(".", indent))
-				fmt.Fprintf(&builder, "%v: %v\n", key, val)
+				fmt.Fprintf(&builder, "%v: %v\n", key, stringifyNil(val))
 			}
 		}
 		builder.WriteString(strings.Repeat(".", indent-4))
@@ -53,7 +62,7 @@ func FormatterStylish(tree map[string]map[string]any) string {
 						fmt.Fprintf(&builder, "+ %v: {\n", nameKey)
 						walkMap(n, depth+1)
 					} else {
-						fmt.Fprintf(&builder, "+ %v: %v", nameKey, data[nameKey]["value2"])
+						fmt.Fprintf(&builder, "+ %v: %v", nameKey, stringifyNil(data[nameKey]["value2"]))
 					}
 				}
 				// если тип ветки 'deleted'
@@ -63,7 +72,7 @@ func FormatterStylish(tree map[string]map[string]any) string {
 						fmt.Fprintf(&builder, "- %v: {\n", nameKey)
 						walkMap(n, depth+1)
 					} else {
-						fmt.Fprintf(&builder, "- %v: %v", nameKey, data[nameKey]["value1"])
+						fmt.Fprintf(&builder, "- %v: %v", nameKey, stringifyNil(data[nameKey]["value1"]))
 					}
 				}
 				// если тип ветки 'unchanged'
@@ -73,7 +82,7 @@ func FormatterStylish(tree map[string]map[string]any) string {
 						fmt.Fprintf(&builder, "  %v: {\n", nameKey)
 						walkMap(n, depth+1)
 					} else {
-						fmt.Fprintf(&builder, "  %v: %v", nameKey, data[nameKey]["value1"])
+						fmt.Fprintf(&builder, "  %v: %v", nameKey, stringifyNil(data[nameKey]["value1"]))
 					}
 				}
 				// если тип ветки 'changed'
@@ -83,14 +92,14 @@ func FormatterStylish(tree map[string]map[string]any) string {
 						fmt.Fprintf(&builder, "- %v: {\n", nameKey)
 						walkMap(n, depth+1)
 					} else {
-						fmt.Fprintf(&builder, "- %v: %v\n", nameKey, data[nameKey]["value1"])
+						fmt.Fprintf(&builder, "- %v: %v\n", nameKey, stringifyNil(data[nameKey]["value1"]))
 					}
 					builder.WriteString(strings.Repeat(".", indent))
 					if n, ok := data[nameKey]["value2"].(map[string]any); ok {
 						fmt.Fprintf(&builder, "+ %v: {\n", nameKey)
 						walkMap(n, depth+1)
 					} else {
-						fmt.Fprintf(&builder, "+ %v: %v", nameKey, data[nameKey]["value2"])
+						fmt.Fprintf(&builder, "+ %v: %v", nameKey, stringifyNil(data[nameKey]["value2"]))
 					}
 				}
 				// если тип ветки 'nested'

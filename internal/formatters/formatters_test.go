@@ -46,7 +46,7 @@ func TestFormatterPlainFlatFiles(t *testing.T) {
 	}
 
 	got := FormmaterPlain(diffTreeTest)
-	want := "Property 'age' was removed\nProperty 'first_name' was updated. From 'Ivan' to 'Maksim'\nProperty 'job' was added with value: go developer\n"
+	want := "Property 'age' was removed\nProperty first_name was updated. From 'Ivan' to 'Maksim'Property 'job' was added with value: 'go developer'\n"
 
 	if got != want {
 		t.Errorf("want: %s, got: %s", want, got)
@@ -62,7 +62,7 @@ func TestFormatterPlainNestedFiles(t *testing.T) {
 	}
 
 	got := FormmaterPlain(diffTreeTest)
-	want := "Property 'games' was added with value: the wither 3 wild hunt\nProperty 'user.age' was added with value: '30'\nProperty 'user.job' was removed\nProperty 'user.last_name' was updated. From 'Ivanov' to 'Petrov'\n"
+	want := "Property 'games' was added with value: 'the wither 3 wild hunt'\nProperty 'user.age' was added with value: 30\nProperty 'user.job' was removed\nProperty 'user.last_name' was updated. From 'Ivanov' to 'Petrov'\n"
 
 	if got != want {
 		t.Errorf("want: %s, got: %s", want, got)
@@ -93,7 +93,7 @@ func TestFormatterPlainComplexValue(t *testing.T) {
 	}
 
 	got := FormmaterPlain(diffTreeTest)
-	want := "Property 'games' was updated. From [complex value] to 'gothic 1 remake'\nProperty 'monitor' was added with value: [complex value]\nProperty 'pc.cpu' was updated. From 'intel celerone' to 'intel pentium'\nProperty 'pc.hdd' was added with value: [complex value]\n"
+	want := "Property games was updated. From [complex value] to 'gothic 1 remake'Property 'monitor' was added with value: [complex value]\nProperty 'pc.cpu' was updated. From 'intel celerone' to 'intel pentium'\nProperty 'pc.hdd' was added with value: [complex value]\n"
 
 	if got != want {
 		t.Errorf("want: %s, got: %s", want, got)

@@ -6,45 +6,30 @@ import (
 	"strings"
 )
 
+func stringify(value any) string {
+	switch v := value.(type) {
+	case nil:
+		return "null"
+	case string:
+		return fmt.Sprintf("'%s'", v)
+	case bool, int, int64, float64:
+		return fmt.Sprintf("%v", v)
+	case map[string]any, []any:
+		return "[complex value]"
+	default:
+		return fmt.Sprintf("%v", v)
+	}
+}
+
 func FormmaterPlain(tree map[string]map[string]any) string {
 	var builder strings.Builder
-	//получим все ключи текущего уровня
+	//получим все ключи корневого уровня
 	var allKeys []string
 	for key := range tree {
 		allKeys = append(allKeys, key)
 	}
 	// отсортируем ключи
 	slices.Sort(allKeys)
-	// анонимная функция для рекурсивного прохода вложенной карты
-	var walkMap func(map[string]any)
-	walkMap = func(m map[string]any) {
-		// проходим по всем ключам карты
-		for key, val := range m {
-			// если тип ключа 'added'
-			if key == "type" && "val" == "added" {
-				fmt.Fprintf(&builder, "' was added with value: %v\n", m["value2"])
-				return
-			}
-			// если тип ключа 'deleted
-			if key == "type" && val == "deleted" {
-				fmt.Fprintf(&builder, "' was removed\n")
-				return
-			}
-			// если тип ключа 'changed'
-			if key == "type" && val == "changed" {
-				fmt.Fprintf(&builder, "' was updated. From %v to %v\n", m["value1"], m["value2"])
-				return
-			}
-			// если тип ключа 'nested'
-			// запускаем рекурсивный проход по значению
-			if key == "type" && val == "nested" {
-				fmt.Fprintf(&builder, "%v", key)
-				if n, ok := val.(map[string]any); ok {
-					walkMap(n)
-				}
-			}
-		}
-	}
 
 	// анонимная функция для рекурсивного обхода дерева различий
 	var recChild func(map[string]map[string]any, string)
@@ -59,49 +44,27 @@ func FormmaterPlain(tree map[string]map[string]any) string {
 		// проходим по всем ключам вложенной карты
 		for _, nameKey := range allKeys {
 			for key, val := range data[nameKey] {
-				// если значение является картой то запускам функцию 'walkMap'
-				if n, ok := val.(map[string]any); ok {
-					walkMap(n)
-				} else {
-					// если тип ветки 'added'
-					if key == "type" && val == "added" {
-						fmt.Fprintf(&builder, "%v", name)
-						// если значение явлется составным
-						if _, ok := data[nameKey]["value2"].(map[string]any); ok {
-							fmt.Fprintf(&builder, "%v' was added with value: [complex value]\n", nameKey)
-							// если значение не является составным
-						} else {
-							fmt.Fprintf(&builder, "%v' was added with value: '%v'\n", nameKey, data[nameKey]["value2"])
-						}
-					}
-					// если тип ветки 'deleted'
-					if key == "type" && val == "deleted" {
-						fmt.Fprintf(&builder, "%v", name)
-						fmt.Fprintf(&builder, "%v' was removed\n", nameKey)
-					}
-					// если тип ветки 'changed'
-					if key == "type" && val == "changed" {
-						fmt.Fprintf(&builder, "%v", name)
-						// если первое значение является составным
-						if _, ok := data[nameKey]["value1"].(map[string]any); ok {
-							fmt.Fprintf(&builder, "%v' was updated. From [complex value] to '%v'\n", nameKey, data[nameKey]["value2"])
-							return
-						}
-						// если второе значение является составным
-						if _, ok := data[nameKey]["value2"].(map[string]any); ok {
-							fmt.Fprintf(&builder, "%v' was updated. From '%v' to [complex value]\n", nameKey, data[nameKey]["value1"])
-							return
-						}
-						// если оба значения не являются составными
-						fmt.Fprintf(&builder, "%v' was updated. From '%v' to '%v'\n", nameKey, data[nameKey]["value1"], data[nameKey]["value2"])
-					}
-					// если тип ветки 'nested'
-					// запускаем рекурсивный проход по значению
-					if key == "type" && val == "nested" {
-						name = name + nameKey + "."
-						if child, ok := data[nameKey]["children"].(map[string]map[string]any); ok {
-							recChild(child, name)
-						}
+				// если тип ветки 'added'
+				if key == "type" && val == "added" {
+					fmt.Fprintf(&builder, "%v", name)
+					fmt.Fprintf(&builder, "%v' was added with value: %v\n", nameKey, stringify(data[nameKey]["value2"]))
+				}
+				// если тип ветки 'deleted'
+				if key == "type" && val == "deleted" {
+					fmt.Fprintf(&builder, "%v", name)
+					fmt.Fprintf(&builder, "%v' was removed\n", nameKey)
+				}
+				// если тип ветки 'changed'
+				if key == "type" && val == "changed" {
+					fmt.Fprintf(&builder, "%v", name)
+					fmt.Fprintf(&builder, "%v' was updated. From %v to %v\n", nameKey, stringify(data[nameKey]["value1"]), stringify(data[nameKey]["value2"]))
+				}
+				// если тип ветки 'nested'
+				// запускаем рекурсивный проход по значению
+				if key == "type" && val == "nested" {
+					nameNew := name + nameKey + "."
+					if child, ok := data[nameKey]["children"].(map[string]map[string]any); ok {
+						recChild(child, nameNew)
 					}
 				}
 			}
@@ -113,14 +76,7 @@ func FormmaterPlain(tree map[string]map[string]any) string {
 		for k, v := range tree[nameKey] {
 			// если тип ветки 'added'
 			if k == "type" && v == "added" {
-				fmt.Fprintf(&builder, "Property '%v' was added with value: ", nameKey)
-				// если значение является составным
-				if _, ok := tree[nameKey]["value2"].(map[string]any); ok {
-					fmt.Fprintf(&builder, "[complex value]\n")
-					// если значение не является составным
-				} else {
-					fmt.Fprintf(&builder, "%v\n", tree[nameKey]["value2"])
-				}
+				fmt.Fprintf(&builder, "Property '%v' was added with value: %v\n", nameKey, stringify(tree[nameKey]["value2"]))
 			}
 			// если тип ветки 'deleted'
 			if k == "type" && v == "deleted" {
@@ -128,21 +84,8 @@ func FormmaterPlain(tree map[string]map[string]any) string {
 			}
 			// если тип ветки 'changed'
 			if k == "type" && v == "changed" {
-				fmt.Fprintf(&builder, "Property '%v' was updated. ", nameKey)
-				// если первое значение является составным
-				if _, ok := tree[nameKey]["value1"].(map[string]any); ok {
-					fmt.Fprintf(&builder, "From [complex value] ")
-					// если первое значение не является составным
-				} else {
-					fmt.Fprintf(&builder, "From '%v' ", tree[nameKey]["value1"])
-				}
-				// если второе значение является составным
-				if _, ok := tree[nameKey]["value2"].(map[string]any); ok {
-					fmt.Fprintf(&builder, "to [complex value]\n")
-					// если второе значение не является составным
-				} else {
-					fmt.Fprintf(&builder, "to '%v'\n", tree[nameKey]["value2"])
-				}
+				fmt.Fprintf(&builder, "Property %v was updated. ", nameKey)
+				fmt.Fprintf(&builder, "From %v to %v", stringify(tree[nameKey]["value1"]), stringify(tree[nameKey]["value2"]))
 			}
 			// если тип ветки 'nested'
 			// запускаем рекурсивный проход по значению
