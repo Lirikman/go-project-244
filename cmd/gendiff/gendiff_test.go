@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestGenDiffFlatFiles(t *testing.T) {
+func TestTreeBuildDiffFlatFiles(t *testing.T) {
 	testMap1 := map[string]any{
 		"first_name": "Ivan",
 		"last_name":  "Petrov",
@@ -19,7 +19,7 @@ func TestGenDiffFlatFiles(t *testing.T) {
 		"age":        20,
 		"job":        "php_developer",
 	}
-	got := code.GenDiff(testMap1, testMap2)
+	got := code.TreeBuildDiff(testMap1, testMap2)
 	want := map[string]map[string]any{
 		"first_name": {"type": "unchanged", "value1": "Ivan"},
 		"last_name":  {"type": "unchanged", "value1": "Petrov"},
@@ -32,7 +32,7 @@ func TestGenDiffFlatFiles(t *testing.T) {
 	}
 }
 
-func TestGenDiffNestedFiles(t *testing.T) {
+func TestTreeBuildDiffNestedFiles(t *testing.T) {
 	testMap1 := map[string]any{
 		"user":      map[string]any{"name": "Petr", "last_name": "Ivanov"},
 		"nick_name": "Designer2000",
@@ -47,7 +47,7 @@ func TestGenDiffNestedFiles(t *testing.T) {
 		"job":       "designer",
 		"city":      "Kaliningrad",
 	}
-	got := code.GenDiff(testMap1, testMap2)
+	got := code.TreeBuildDiff(testMap1, testMap2)
 	want := map[string]map[string]any{
 		"user": {"type": "nested", "children": map[string]map[string]any{"name": {"type": "changed", "value1": "Petr", "value2": "Boris"},
 			"last_name": {"type": "unchanged", "value1": "Ivanov"}}},
@@ -63,7 +63,7 @@ func TestGenDiffNestedFiles(t *testing.T) {
 	}
 }
 
-func TestGenDiffEmptyFirstFile(t *testing.T) {
+func TestTreeBuildDiffEmptyFirstFile(t *testing.T) {
 	testMap1 := map[string]any{}
 	testMap2 := map[string]any{
 		"first_name": "Ivan",
@@ -72,7 +72,7 @@ func TestGenDiffEmptyFirstFile(t *testing.T) {
 		"job":        "php_developer",
 	}
 
-	got := code.GenDiff(testMap1, testMap2)
+	got := code.TreeBuildDiff(testMap1, testMap2)
 	want := map[string]map[string]any{
 		"first_name": {"type": "added", "value2": "Ivan"},
 		"last_name":  {"type": "added", "value2": "Petrov"},
@@ -85,7 +85,7 @@ func TestGenDiffEmptyFirstFile(t *testing.T) {
 	}
 }
 
-func TestGenDiffEmptySecondFile(t *testing.T) {
+func TestTreeBuildDiffEmptySecondFile(t *testing.T) {
 	testMap1 := map[string]any{
 		"first_name": "Ivan",
 		"last_name":  "Petrov",
@@ -94,7 +94,7 @@ func TestGenDiffEmptySecondFile(t *testing.T) {
 	}
 	testMap2 := map[string]any{}
 
-	got := code.GenDiff(testMap1, testMap2)
+	got := code.TreeBuildDiff(testMap1, testMap2)
 	want := map[string]map[string]any{
 		"first_name": {"type": "deleted", "value1": "Ivan"},
 		"last_name":  {"type": "deleted", "value1": "Petrov"},

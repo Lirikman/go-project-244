@@ -11,7 +11,7 @@ func TestFormatterStylishFlatFiles(t *testing.T) {
 	}
 
 	got := FormatterStylish(diffTreeTest)
-	want := "{\n..- age: 20\n..- first_name: Ivan\n..+ first_name: Maksim\n..+ job: go developer\n..  last_name: Sidorov\n}"
+	want := "{\n  - age: 20\n  - first_name: Ivan\n  + first_name: Maksim\n  + job: go developer\n    last_name: Sidorov\n}"
 
 	if got != want {
 		t.Errorf("want: %s, got: %s", want, got)
@@ -30,7 +30,7 @@ func TestFormatterStylishNestedFiles(t *testing.T) {
 		"games": {"type": "added", "value2": map[string]any{"offline": map[string]any{"rpg": "elden ring"}}}}
 
 	got := FormatterStylish(diffTreeTest)
-	want := "{\n..- email: tester@ya.ru\n..+ email: developer@mail.ru\n..+ games: {\n........offline: {\n............rpg: elden ring\n........}\n....}\n..  pc: {\n......  cpu: intel core i5 11400\n......- os: windows 10 PRO x64\n......- ram: 16Gb DDR5\n......+ ram: 32Gb DDR5\n......  storage: {\n..........- hdd: Toshiba 2Tb\n..........+ hdd: Seagate 4 Tb\n..........+ m2_nvme: Samsung 870EVO\n..........  ssd: Hitachi 1TB\n......  }\n..  }\n..  user: {\n......+ age: 20\n......  first_name: Ivan\n......- last_name: Ivanov\n......+ last_name: Petrov\n..  }\n}"
+	want := "{\n  - email: tester@ya.ru\n  + email: developer@mail.ru\n  + games: {\n        offline: {\n            rpg: elden ring\n        }\n    }\n    pc: {\n        cpu: intel core i5 11400\n      - os: windows 10 PRO x64\n      - ram: 16Gb DDR5\n      + ram: 32Gb DDR5\n        storage: {\n          - hdd: Toshiba 2Tb\n          + hdd: Seagate 4 Tb\n          + m2_nvme: Samsung 870EVO\n            ssd: Hitachi 1TB\n        }\n    }\n    user: {\n      + age: 20\n        first_name: Ivan\n      - last_name: Ivanov\n      + last_name: Petrov\n    }\n}"
 
 	if got != want {
 		t.Errorf("want: %s, got: %s", want, got)
@@ -46,7 +46,7 @@ func TestFormatterPlainFlatFiles(t *testing.T) {
 	}
 
 	got := FormmaterPlain(diffTreeTest)
-	want := "Property 'age' was removed\nProperty first_name was updated. From 'Ivan' to 'Maksim'Property 'job' was added with value: 'go developer'\n"
+	want := "Property 'age' was removed\nProperty first_name was updated. From 'Ivan' to 'Maksim'Property 'job' was added with value: 'go developer'"
 
 	if got != want {
 		t.Errorf("want: %s, got: %s", want, got)
@@ -62,7 +62,7 @@ func TestFormatterPlainNestedFiles(t *testing.T) {
 	}
 
 	got := FormmaterPlain(diffTreeTest)
-	want := "Property 'games' was added with value: 'the wither 3 wild hunt'\nProperty 'user.age' was added with value: 30\nProperty 'user.job' was removed\nProperty 'user.last_name' was updated. From 'Ivanov' to 'Petrov'\n"
+	want := "Property 'games' was added with value: 'the wither 3 wild hunt'\nProperty 'user.age' was added with value: 30\nProperty 'user.job' was removed\nProperty 'user.last_name' was updated. From 'Ivanov' to 'Petrov'"
 
 	if got != want {
 		t.Errorf("want: %s, got: %s", want, got)
@@ -77,7 +77,7 @@ func TestFormatterPlainNestedChildNode(t *testing.T) {
 				"ssd": {"type": "deleted", "value1": "Crucial 256Gb"}, "m2_nvme": {"type": "added", "value2": "samsung evo 870 1Tb"}}}}}}
 
 	got := FormmaterPlain(diffTreeTest)
-	want := "Property 'pc.VGA' was added with value: 'NVIDIA RTX5080'\nProperty 'pc.cpu' was updated. From 'intel core i5 12400' to 'intel core i7 12700K'\nProperty 'pc.storage.hdd' was added with value: 'Hitachi 4Tb'\nProperty 'pc.storage.m2_nvme' was added with value: 'samsung evo 870 1Tb'\nProperty 'pc.storage.ssd' was removed\n"
+	want := "Property 'pc.VGA' was added with value: 'NVIDIA RTX5080'\nProperty 'pc.cpu' was updated. From 'intel core i5 12400' to 'intel core i7 12700K'\nProperty 'pc.storage.hdd' was added with value: 'Hitachi 4Tb'\nProperty 'pc.storage.m2_nvme' was added with value: 'samsung evo 870 1Tb'\nProperty 'pc.storage.ssd' was removed"
 
 	if got != want {
 		t.Errorf("want: %s, got: %s", want, got)
@@ -93,7 +93,7 @@ func TestFormatterPlainComplexValue(t *testing.T) {
 	}
 
 	got := FormmaterPlain(diffTreeTest)
-	want := "Property games was updated. From [complex value] to 'gothic 1 remake'Property 'monitor' was added with value: [complex value]\nProperty 'pc.cpu' was updated. From 'intel celerone' to 'intel pentium'\nProperty 'pc.hdd' was added with value: [complex value]\n"
+	want := "Property games was updated. From [complex value] to 'gothic 1 remake'Property 'monitor' was added with value: [complex value]\nProperty 'pc.cpu' was updated. From 'intel celerone' to 'intel pentium'\nProperty 'pc.hdd' was added with value: [complex value]"
 
 	if got != want {
 		t.Errorf("want: %s, got: %s", want, got)
