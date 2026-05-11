@@ -2,14 +2,17 @@ package formatters
 
 func FormatMessage(tree map[string]map[string]any, format string) string {
 	var message string
-	if format == "" || format == "stylish" {
+	switch format {
+	case "":
 		message = FormatterStylish(tree)
-	}
-	if format == "plain" {
+	case "stylish":
+		message = FormatterStylish(tree)
+	case "plain":
 		message = FormmaterPlain(tree)
-	}
-	if format == "json" {
+	case "json":
 		message = FormmaterJson(tree)
+	default:
+		message = "unknown format"
 	}
 	return message
 }

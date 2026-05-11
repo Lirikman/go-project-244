@@ -2,8 +2,6 @@ package main
 
 import (
 	"code"
-	formatters "code/internal/formatters"
-	parser "code/internal/parsers"
 	"context"
 	"fmt"
 	"log"
@@ -42,30 +40,17 @@ func main() {
 			_, errPath2 := os.Stat(path2)
 
 			if errPath1 != nil || errPath2 != nil {
-				return fmt.Errorf("files at the entered path were not found")
+				return fmt.Errorf("incorrect paths entered")
 			}
 			if path1 == "" || path2 == "" {
-				return fmt.Errorf("invalid files path")
+				return fmt.Errorf("exactly two arguments are required")
 			}
-
-			// парсинг данных из файлов
-			_, err := parser.ReadData(path1)
-			if err != nil {
-				return err
-			}
-			data, err := parser.ReadData(path2)
-			if err != nil {
-				return err
-			}
-			// разделение на две карты
-			data1, data2 := code.SplitNestedMap(data)
-			// очистка данных парсинга
-			clear(data)
-			// построение дерева отличий
-			deffTree := code.GenDiff(data1, data2)
 			// построение ответа в выбранном формате (по умолчанию - "stylish")
-			fmt.Println(formatters.FormatMessage(deffTree, cmd.String("format")))
-			return nil
+			res, err := code.GenDiff(path1, path2, cmd.String("format"))
+			if err == nil {
+				fmt.Println(res)
+			}
+			return err
 		},
 	}
 

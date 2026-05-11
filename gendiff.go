@@ -1,6 +1,8 @@
 package code
 
 import (
+	formatters "code/internal/formatters"
+	parser "code/internal/parsers"
 	"reflect"
 	"slices"
 )
@@ -21,7 +23,7 @@ func SplitNestedMap(dataMap map[string]map[string]any) (map[string]any, map[stri
 }
 
 // функция построения дерева различий
-func GenDiff(data1 map[string]any, data2 map[string]any) map[string]map[string]any {
+func TreeBuildDiff(data1 map[string]any, data2 map[string]any) map[string]map[string]any {
 	// переменная для хранения уникальных ключей текущего уровня
 	var allUniqueKeys []string
 	// получаем ключи с первой карты
@@ -73,7 +75,7 @@ func GenDiff(data1 map[string]any, data2 map[string]any) map[string]map[string]a
 					diff[nameKey] = make(map[string]any)
 				}
 				diff[nameKey]["type"] = "nested"
-				diff[nameKey]["children"] = GenDiff(m1, m2)
+				diff[nameKey]["children"] = TreeBuildDiff(m1, m2)
 				// одно или оба значения не являются картами
 			} else {
 				// если карта пустая, то инициализируем её
@@ -93,4 +95,26 @@ func GenDiff(data1 map[string]any, data2 map[string]any) map[string]map[string]a
 		}
 	}
 	return diff
+}
+
+// функция генерации отличий по заданному формату
+func GenDiff(filepath1, filepath2, formatName string) (string, error) {
+	// парсинг данных из файлов
+	_, err := parser.ReadData(filepath1)
+	if err != nil {
+		return "", err
+	}
+	data, err := parser.ReadData(filepath2)
+	if err != nil {
+		return "", err
+	}
+	// разделение на две карты
+	data1, data2 := SplitNestedMap(data)
+	// очистка данных парсинга
+	clear(data)
+	// построение дерева отличий
+	deffTree := TreeBuildDiff(data1, data2)
+	// вывод сообщения в выбранном формате
+	result := formatters.FormatMessage(deffTree, formatName)
+	return result, nil
 }
