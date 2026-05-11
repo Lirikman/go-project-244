@@ -97,6 +97,10 @@ func FormmaterPlain(tree map[string]map[string]any) string {
 			}
 		}
 	}
+	// если последний символ это пернос строки, то убирем его
+	if result, ok := strings.CutSuffix(builder.String(), "\n"); ok {
+		return result
+	}
 	// возвращаем сообщение
 	return builder.String()
 }

@@ -26,15 +26,15 @@ func FormatterStylish(tree map[string]map[string]any) string {
 		indent := d * 4
 		for key, val := range m {
 			if nestedMap, ok := val.(map[string]any); ok {
-				builder.WriteString(strings.Repeat(".", indent))
+				builder.WriteString(strings.Repeat(" ", indent))
 				fmt.Fprintf(&builder, "%v: {\n", key)
 				walkMap(nestedMap, d+1)
 			} else {
-				builder.WriteString(strings.Repeat(".", indent))
+				builder.WriteString(strings.Repeat(" ", indent))
 				fmt.Fprintf(&builder, "%v: %v\n", key, stringifyNil(val))
 			}
 		}
-		builder.WriteString(strings.Repeat(".", indent-4))
+		builder.WriteString(strings.Repeat(" ", indent-4))
 		builder.WriteString("}\n")
 	}
 
@@ -57,7 +57,7 @@ func FormatterStylish(tree map[string]map[string]any) string {
 				indent := depth*4 - 2
 				// если типа ветки 'added'
 				if k == "type" && v == "added" {
-					builder.WriteString(strings.Repeat(".", indent))
+					builder.WriteString(strings.Repeat(" ", indent))
 					if n, ok := data[nameKey]["value2"].(map[string]any); ok {
 						fmt.Fprintf(&builder, "+ %v: {\n", nameKey)
 						walkMap(n, depth+1)
@@ -67,7 +67,7 @@ func FormatterStylish(tree map[string]map[string]any) string {
 				}
 				// если тип ветки 'deleted'
 				if k == "type" && v == "deleted" {
-					builder.WriteString(strings.Repeat(".", indent))
+					builder.WriteString(strings.Repeat(" ", indent))
 					if n, ok := data[nameKey]["value1"].(map[string]any); ok {
 						fmt.Fprintf(&builder, "- %v: {\n", nameKey)
 						walkMap(n, depth+1)
@@ -77,7 +77,7 @@ func FormatterStylish(tree map[string]map[string]any) string {
 				}
 				// если тип ветки 'unchanged'
 				if k == "type" && v == "unchanged" {
-					builder.WriteString(strings.Repeat(".", indent))
+					builder.WriteString(strings.Repeat(" ", indent))
 					if n, ok := data[nameKey]["value1"].(map[string]any); ok {
 						fmt.Fprintf(&builder, "  %v: {\n", nameKey)
 						walkMap(n, depth+1)
@@ -87,14 +87,14 @@ func FormatterStylish(tree map[string]map[string]any) string {
 				}
 				// если тип ветки 'changed'
 				if k == "type" && v == "changed" {
-					builder.WriteString(strings.Repeat(".", indent))
+					builder.WriteString(strings.Repeat(" ", indent))
 					if n, ok := data[nameKey]["value1"].(map[string]any); ok {
 						fmt.Fprintf(&builder, "- %v: {\n", nameKey)
 						walkMap(n, depth+1)
 					} else {
 						fmt.Fprintf(&builder, "- %v: %v\n", nameKey, stringifyNil(data[nameKey]["value1"]))
 					}
-					builder.WriteString(strings.Repeat(".", indent))
+					builder.WriteString(strings.Repeat(" ", indent))
 					if n, ok := data[nameKey]["value2"].(map[string]any); ok {
 						fmt.Fprintf(&builder, "+ %v: {\n", nameKey)
 						walkMap(n, depth+1)
@@ -104,12 +104,12 @@ func FormatterStylish(tree map[string]map[string]any) string {
 				}
 				// если тип ветки 'nested'
 				if k == "type" && v == "nested" {
-					builder.WriteString(strings.Repeat(".", indent))
+					builder.WriteString(strings.Repeat(" ", indent))
 					fmt.Fprintf(&builder, "  %v: {\n", nameKey)
 					if child, ok := data[nameKey]["children"].(map[string]map[string]any); ok {
 						recChild(child, depth+1)
 					}
-					builder.WriteString(strings.Repeat(".", indent))
+					builder.WriteString(strings.Repeat(" ", indent))
 					builder.WriteString("  }")
 				}
 			}
