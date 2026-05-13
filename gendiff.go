@@ -3,23 +3,23 @@ package code
 import (
 	formatters "code/internal/formatters"
 	parser "code/internal/parsers"
+	"errors"
 	"reflect"
 	"slices"
 )
 
 // функция разделения вложенной карты на две отдельные карты
-func SplitNestedMap(dataMap map[string]map[string]any) (map[string]any, map[string]any) {
-	// переменная для хранения имён файлов
-	var allNames []string
-
-	// получаем имена файлов
-	for filename := range dataMap {
-		allNames = append(allNames, filename)
+func SplitNestedMap(dataMap map[int]map[string]any) (map[string]any, map[string]any, error) {
+	errTwoArgEx := errors.New("exactly two arguments are required")
+	// проверка на наличие всего двух записей
+	if len(dataMap) != 2 {
+		return map[string]any{}, map[string]any{}, errTwoArgEx
 	}
-	//  создаём и заполняем карты
-	data1 := dataMap[allNames[0]]
-	data2 := dataMap[allNames[1]]
-	return data1, data2
+	// переменная для хранения первого файла
+	data1 := dataMap[0]
+	// переменная для хранения второго файла
+	data2 := dataMap[1]
+	return data1, data2, nil
 }
 
 // функция построения дерева различий
@@ -108,10 +108,11 @@ func GenDiff(filepath1, filepath2, formatName string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	// разделение на две карты
-	data1, data2 := SplitNestedMap(data)
-	// очистка данных парсинга
-	clear(data)
+	// разделение на две картыcl
+	data1, data2, err := SplitNestedMap(data)
+	if err != nil {
+		return "", errors.New("data partitioning error")
+	}
 	// построение дерева отличий
 	deffTree := TreeBuildDiff(data1, data2)
 	// вывод сообщения в выбранном формате

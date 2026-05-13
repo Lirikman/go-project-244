@@ -39,13 +39,13 @@ func TestReadData(t *testing.T) {
 	tests := []struct {
 		name string
 		path string
-		want map[string]map[string]any
+		want map[int]map[string]any
 		err  error
 	}{
 		{"empty_json_file", "./testdata/empty.json", nil, errors.New("unable to deserialize JSON file")},
-		{"empty_yaml_file", "./testdata/empty.yaml", map[string]map[string]any{"empty.yaml": nil}, nil},
-		{"file_yaml", "./testdata/file2.yaml", map[string]map[string]any{"file2.yaml": {"timeout": 20, "verbose": true, "host": "hexlet.io"}, "empty.yaml": nil}, nil},
-		{"file_json", "./testdata/file1.json", map[string]map[string]any{"file1.json": {"user_id": "100", "username": "ivan", "is_admin": false}, "file2.yaml": {"timeout": 20, "verbose": true, "host": "hexlet.io"}, "empty.yaml": nil}, nil},
+		{"empty_yaml_file", "./testdata/empty.yaml", map[int]map[string]any{0: nil}, nil},
+		{"file_yaml", "./testdata/file2.yaml", map[int]map[string]any{0: nil, 1: {"timeout": 20, "verbose": true, "host": "hexlet.io"}}, nil},
+		{"file_json", "./testdata/file1.json", map[int]map[string]any{0: nil, 1: {"timeout": 20, "verbose": true, "host": "hexlet.io"}, 2: {"user_id": "100", "username": "ivan", "is_admin": false}}, nil},
 		{"read_error_json_file", "./testdata/noFile.json", nil, errors.New("file read error")},
 		{"read_error_yaml_file", "./testdata/noFile.yaml", nil, errors.New("file read error")},
 	}
