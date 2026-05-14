@@ -28,7 +28,7 @@ GLOBAL OPTIONS:
 
 ```bash
 git clone https://github.com/Lirikman/go-project-244.git
-cd go-project-24
+cd go-project-244
 ```
 
 ### Run build
