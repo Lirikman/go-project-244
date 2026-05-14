@@ -9,12 +9,12 @@ import (
 )
 
 // функция разделения вложенной карты на две отдельные карты
-func SplitNestedMap(dataMap map[int]map[string]any) (map[string]any, map[string]any, error) {
+func SplitNestedMap(dataMap map[int]map[string]any) (map[string]any, map[string]any) {
 	// переменная для хранения первого файла
 	data1 := dataMap[0]
 	// переменная для хранения второго файла
 	data2 := dataMap[1]
-	return data1, data2, nil
+	return data1, data2
 }
 
 // функция построения дерева различий
@@ -104,10 +104,7 @@ func GenDiff(filepath1, filepath2, formatName string) (string, error) {
 		return "", fmt.Errorf("error reading file2: %w", err)
 	}
 	// разделение на две карты
-	data1, data2, err := SplitNestedMap(data)
-	if err != nil {
-		return "", fmt.Errorf("error split nested map: %w", err)
-	}
+	data1, data2 := SplitNestedMap(data)
 	// построение дерева отличий
 	deffTree := TreeBuildDiff(data1, data2)
 	// вывод сообщения в выбранном формате
