@@ -3,7 +3,6 @@ package code
 import (
 	formatters "code/internal/formatters"
 	parser "code/internal/parsers"
-	"errors"
 	"fmt"
 	"reflect"
 	"slices"
@@ -11,11 +10,6 @@ import (
 
 // функция разделения вложенной карты на две отдельные карты
 func SplitNestedMap(dataMap map[int]map[string]any) (map[string]any, map[string]any, error) {
-	errTwoArgEx := errors.New("exactly two arguments are required")
-	// проверка на наличие всего двух записей
-	if len(dataMap) != 2 {
-		return map[string]any{}, map[string]any{}, errTwoArgEx
-	}
 	// переменная для хранения первого файла
 	data1 := dataMap[0]
 	// переменная для хранения второго файла
