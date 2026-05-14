@@ -24,14 +24,22 @@ func FormatterStylish(tree map[string]map[string]any) string {
 	var walkMap func(map[string]any, int)
 	walkMap = func(m map[string]any, d int) {
 		indent := d * 4
-		for key, val := range m {
-			if nestedMap, ok := val.(map[string]any); ok {
+		//получим все ключи текущего уровня
+		var allKeys []string
+		for key := range m {
+			allKeys = append(allKeys, key)
+		}
+		// отсортируем ключи
+		slices.Sort(allKeys)
+		// проходим по всем ключам и добавляем в сообщение
+		for _, namekey := range allKeys {
+			if nestedMap, ok := m[namekey].(map[string]any); ok {
 				builder.WriteString(strings.Repeat(" ", indent))
-				fmt.Fprintf(&builder, "%v: {\n", key)
+				fmt.Fprintf(&builder, "%v: {\n", namekey)
 				walkMap(nestedMap, d+1)
 			} else {
 				builder.WriteString(strings.Repeat(" ", indent))
-				fmt.Fprintf(&builder, "%v: %v\n", key, stringifyNil(val))
+				fmt.Fprintf(&builder, "%v: %v\n", namekey, stringifyNil(m[namekey]))
 			}
 		}
 		builder.WriteString(strings.Repeat(" ", indent-4))

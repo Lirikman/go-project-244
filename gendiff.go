@@ -4,6 +4,7 @@ import (
 	formatters "code/internal/formatters"
 	parser "code/internal/parsers"
 	"errors"
+	"fmt"
 	"reflect"
 	"slices"
 )
@@ -102,16 +103,16 @@ func GenDiff(filepath1, filepath2, formatName string) (string, error) {
 	// парсинг данных из файлов
 	_, err := parser.ReadData(filepath1)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("error reading file1: %w", err)
 	}
 	data, err := parser.ReadData(filepath2)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("error reading file2: %w", err)
 	}
-	// разделение на две картыcl
+	// разделение на две карты
 	data1, data2, err := SplitNestedMap(data)
 	if err != nil {
-		return "", errors.New("data partitioning error")
+		return "", fmt.Errorf("error split nested map: %w", err)
 	}
 	// построение дерева отличий
 	deffTree := TreeBuildDiff(data1, data2)
